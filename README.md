@@ -23,6 +23,20 @@ Welcome to Online marketplace, this guide will walk yyou through the steps to se
 
 ### Data flow
 
+#### Overall design
+```mermaid
+flowchart LR
+    A[Clients] -->|Request| B{Main}
+    B <-->|user request| D{Users}
+    B <-->|product request| E{Products}
+    B <-->|Order requests| F{Orders}
+    D <-->|DATA| G[(Database)]
+    F <-->|DATA| G[(Database)]
+    E <-->|DATA| G[(Database)]
+    F -->|Message Queu| E
+```
+
+#### Module design
 ```mermaid
 flowchart LR
     Data -->id1{api/endpoint} <-->id2{controller}<-->id3{service}<-->id4[(Database)]
