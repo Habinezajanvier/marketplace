@@ -128,6 +128,14 @@ cp .env.example .env
 
 Using your postgres CLI or postgres Client, create a database name, and replace it in your `.env`
 
+NB: To run local postgres DB from docker literally use
+```
+DB_USER_DEV=postgres
+DB_PASS_DEV='postgres'
+DB_NAME_DEV='marketplace'
+DB_HOST_DEV=db
+```
+
 #### Starting the server
 
 Start the project using docker compose
