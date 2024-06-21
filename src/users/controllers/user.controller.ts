@@ -74,7 +74,7 @@ export default class UserController {
     const hashedOtp = await hashPassword(otp);
     const otpToken = encode({ otp: hashedOtp }, 600);
 
-    const emailTemplate = otpTemplate(newUser.firstName, otp);
+    const emailTemplate = otpTemplate(otp, newUser.firstName);
 
     await this.message.sendMessage(
       { email: newUser.email!, title: 'Password Reset', text: emailTemplate },
@@ -92,6 +92,7 @@ export default class UserController {
   @Post('/login')
   @ApiOperation({ summary: 'User login' })
   @ApiResponse({ status: 200, description: 'User logged successfully' })
+  @HttpCode(200)
   async login(
     @Body() body: LoginDTO,
   ): Promise<
@@ -135,6 +136,7 @@ export default class UserController {
   @Post('/verify')
   @ApiOperation({ summary: 'User verification' })
   @ApiResponse({ status: 200, description: 'User Verified successfully' })
+  @HttpCode(200)
   async verify(@Body() body: VerifyDTO) {
     const { otp, email } = body;
     const userExist = await this.user.checkUser(email);
