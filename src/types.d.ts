@@ -18,11 +18,16 @@ interface ReturnData<T> {
 interface ResponseData<T> {
   error: boolean;
   message: string;
-  data?: T | ResponseData<T>;
+  data?: T;
 }
 
 interface EmailDTO {
   email: string;
   title: string;
   text: string;
+}
+
+interface Paginations {
+  page?: number;
+  pageSize?: number;
 }
