@@ -53,7 +53,10 @@ export default class ProductService {
    * @returns
    */
   getOne = async (id: number): Promise<ProductEntity | null> => {
-    return await this.productRepository.findOne({ where: { id } });
+    return await this.productRepository.findOne({
+      where: { id },
+      relations: { categories: true },
+    });
   };
 
   /**

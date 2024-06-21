@@ -1,5 +1,6 @@
-import { Column, Entity } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany } from 'typeorm';
 import { BaseColumnSchema } from '../../baseEntinty';
+import { CategoryEntity } from './category.entity';
 
 @Entity({ name: 'products' })
 export class ProductEntity extends BaseColumnSchema {
@@ -27,6 +28,7 @@ export class ProductEntity extends BaseColumnSchema {
   })
   avatars: string[];
 
-  //   @ManyToMany(() => OrderEntity)
-  //   orders: OrderEntity[];
+  @ManyToMany(() => CategoryEntity)
+  @JoinTable()
+  categories: CategoryEntity[];
 }

@@ -1,4 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { CategoryDTO } from './category.dto';
+
+class CategoryType {
+  @ApiProperty()
+  id: string;
+}
 
 export class ProductDTO {
   @ApiProperty()
@@ -15,6 +21,9 @@ export class ProductDTO {
 
   @ApiProperty()
   price: number;
+
+  @ApiProperty({ type: [CategoryType] })
+  categories: CategoryDTO[];
 
   createdBy?: number;
 

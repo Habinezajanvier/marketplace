@@ -57,7 +57,6 @@ export default class CategoryController {
   }
 
   @Get('/')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all categories' })
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
