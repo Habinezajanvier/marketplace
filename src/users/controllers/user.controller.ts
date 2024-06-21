@@ -23,7 +23,7 @@ import {
 import { AuthGuard } from '../authorisation/auth.guards';
 import MessageService, { MessageChannels } from '../services/messages';
 import { MailerService } from '../services/message.gateway';
-import { otpTemplate } from 'src/template/otpTemplate';
+import { otpTemplate } from '../../template/otpTemplate';
 import digitid from '../helpers/digitid';
 
 /**
