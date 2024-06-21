@@ -41,7 +41,7 @@ export default class ProductController {
     @Request() req,
     @Body() body: ProductDTO,
   ): Promise<ResponseData<ProductEntity>> {
-    const { name, avatars, quantity, picture, price } = body;
+    const { name, avatars, quantity, picture, price, categories } = body;
     const createdBy = req.user.id;
 
     const data = await this.product.create({
@@ -51,6 +51,7 @@ export default class ProductController {
       picture,
       createdBy,
       price,
+      categories,
     });
 
     return {
@@ -61,7 +62,6 @@ export default class ProductController {
   }
 
   @Get('/')
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all products' })
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -85,8 +85,6 @@ export default class ProductController {
   }
 
   @Get(':id')
-  @UseGuards(AuthGuard)
-  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get one products by Id' })
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -124,7 +122,7 @@ export default class ProductController {
     @Body() body: ProductDTO,
   ): Promise<NotFoundError | ResponseData<ProductEntity>> {
     const { id } = params;
-    const { name, avatars, quantity, picture, price } = body;
+    const { name, avatars, quantity, picture, price, categories } = body;
     const updatedBy = req.user.id;
     const data = await this.product.update(id, {
       name,
@@ -133,7 +131,8 @@ export default class ProductController {
       picture,
       updatedBy,
       price,
-    });
+      categories,
+    } as ProductDTO);
     return data
       ? {
           error: false,
