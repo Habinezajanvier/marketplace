@@ -29,3 +29,8 @@ export class ProductDTO {
 
   updatedBy?: number;
 }
+
+export class AssignCategoryDTO {
+  @ApiProperty({ type: [CategoryType] })
+  categories: CategoryDTO[];
+}
