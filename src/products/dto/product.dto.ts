@@ -28,6 +28,8 @@ export class ProductDTO {
   createdBy?: number;
 
   updatedBy?: number;
+
+  id?: number;
 }
 
 export class AssignCategoryDTO {

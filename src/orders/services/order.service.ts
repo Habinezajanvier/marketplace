@@ -4,7 +4,8 @@ import { DataSource, DeleteResult, Repository } from 'typeorm';
 import { OrderEntity } from '../entities/orders.entitiy';
 import { OrderDTO } from '../dto/orders.dto';
 import { PaginationDTO } from 'src/common.dto';
-import { ProductsOrderEntinty } from '../entities/productOrder.entity';
+import { OrderItemsEntity } from '../entities/productOrder.entity';
+import { RabbitMQConnection } from 'src/rabbit.connection';
 
 @Injectable()
 export default class OrderService {
@@ -13,6 +14,7 @@ export default class OrderService {
     private readonly orderRepository: Repository<OrderEntity>,
 
     private readonly dataSource: DataSource,
+    private readonly mqConnection: RabbitMQConnection,
   ) {}
 
   /**
@@ -25,6 +27,7 @@ export default class OrderService {
     await queryRunner.startTransaction();
     let orderData: OrderEntity;
     try {
+      await this.mqConnection.sendToQueue('orders', order.products);
       orderData = await queryRunner.manager.save(OrderEntity, {
         createdBy: order.createdBy,
         updatedBy: order.createdBy,
@@ -34,7 +37,7 @@ export default class OrderService {
 
       await Promise.all(
         order.products.map((item) => {
-          queryRunner.manager.save(ProductsOrderEntinty, {
+          queryRunner.manager.save(OrderItemsEntity, {
             order: orderData,
             productId: item.id,
             quantity: item.quantity,
@@ -68,7 +71,7 @@ export default class OrderService {
       take: pageSize,
       skip,
       relations: {
-        productOder: true,
+        orderItems: true,
       },
       select: {
         id: true,
@@ -79,7 +82,7 @@ export default class OrderService {
           sector: true,
           village: true,
         },
-        productOder: {
+        orderItems: {
           id: true,
           amount: true,
           quantity: true,
@@ -101,7 +104,7 @@ export default class OrderService {
     return await this.orderRepository.findOne({
       where: { id },
       relations: {
-        productOder: true,
+        orderItems: true,
       },
       select: {
         id: true,
@@ -111,7 +114,7 @@ export default class OrderService {
           village: true,
         },
         createdBy: true,
-        productOder: {
+        orderItems: {
           id: true,
           amount: true,
           quantity: true,
