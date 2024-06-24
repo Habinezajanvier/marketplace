@@ -76,6 +76,22 @@ export default class ProductService {
     return await this.productRepository.save(product);
   };
 
+  decrement = async (
+    id: number,
+    decrement: number,
+  ): Promise<ProductEntity | null> => {
+    const product = (await this.productRepository.findOneBy({
+      id,
+    })) as ProductEntity;
+    this.productRepository.merge(product, {
+      quantity: product.quantity - decrement,
+    });
+    const data = await this.productRepository.save(product);
+    console.log({ data });
+
+    return data;
+  };
+
   /**
    * Delete a product
    * @param id
