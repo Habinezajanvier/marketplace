@@ -15,11 +15,13 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  //   ApiBody,
+  //   ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ProductDTO } from '../dto/product.dto';
+import { AssignCategoryDTO, ProductDTO } from '../dto/product.dto';
 import { ProductEntity } from '../entities/products.entity';
 import { AuthGuard } from 'src/users/authorisation/auth.guards';
 import { PaginationDTO, ParamsDTO } from 'src/common.dto';
@@ -34,6 +36,38 @@ export default class ProductController {
   @Post('/')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
+  //   @ApiConsumes('multipart/form-data')
+  //   @ApiBody({
+  //     schema: {
+  //       type: 'object',
+  //       properties: {
+  //         name: { type: 'string' },
+  //         quantity: { type: 'integer' },
+  //         avatars: {
+  //           type: 'array',
+  //           items: {
+  //             type: 'string',
+  //             format: 'binary',
+  //           },
+  //         },
+  //         picture: {
+  //           type: 'string',
+  //           format: 'binary',
+  //         },
+  //         categories: {
+  //           type: 'array',
+  //           items: {
+  //             type: 'object',
+  //             properties: {
+  //               id: {
+  //                 type: 'integer',
+  //               },
+  //             },
+  //           },
+  //         },
+  //       },
+  //     },
+  //   })
   @ApiOperation({ summary: 'Register new product' })
   @ApiResponse({ status: 201, description: 'Product registered successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -41,6 +75,7 @@ export default class ProductController {
     @Request() req,
     @Body() body: ProductDTO,
   ): Promise<ResponseData<ProductEntity>> {
+    console.log(JSON.stringify({ body: req.body }, null, 2));
     const { name, avatars, quantity, picture, price, categories } = body;
     const createdBy = req.user.id;
 
@@ -164,6 +199,41 @@ export default class ProductController {
       ? {
           error: false,
           message: 'Success',
+          data,
+        }
+      : new HttpException(
+          {
+            error: true,
+            message: 'No product found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+  }
+
+  @Put(':id/assignCategory')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Assign category to product' })
+  @ApiResponse({ status: 200, description: 'Success' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async assignCategory(
+    @Request() req,
+    @Param() params: ParamsDTO,
+    @Body() body: AssignCategoryDTO,
+  ): Promise<NotFoundError | ResponseData<ProductEntity>> {
+    const { id } = params;
+    const { categories } = body;
+    const updatedBy = req.user.id;
+
+    const data = await this.product.update(id, {
+      updatedBy,
+      categories,
+    } as ProductDTO);
+    return data
+      ? {
+          error: false,
+          message: 'Successfully updated the product',
           data,
         }
       : new HttpException(
