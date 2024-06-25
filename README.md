@@ -123,6 +123,10 @@ Create `.env` file in your root directory and fill it using `.env.example` templ
 ```bash
 cp .env.example .env
 ```
+For docker environment
+```bash
+cp .env.example .env.docker.local
+```
 
 #### Database Setup
 
