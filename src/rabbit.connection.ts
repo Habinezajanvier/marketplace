@@ -15,7 +15,7 @@ export class RabbitMQConnection {
     else this.connected = true;
 
     try {
-      this.connection = await amq.connect(`amqp://localhost:5672`);
+      this.connection = await amq.connect(`amqp://${process.env.MMQ_URL}:5672`);
 
       Logger.log(`✅ Rabbit MQ Connection is ready`);
 

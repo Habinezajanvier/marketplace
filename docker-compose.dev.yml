@@ -11,9 +11,12 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - ./.env
+      - ./.env.docker.local
     depends_on:
       - db
+      - rabbitMq
+    networks:
+      - marketplace_network
 
   db:
     image: postgres:14.1-alpine
@@ -27,6 +30,27 @@ services:
       - "5439:5432"
     volumes:
       - db:/var/lib/postgresql/data
+    networks:
+      - marketplace_network
+
+  rabbitMq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - marketplace_network
+
 volumes:
   db:
     driver: local
+
+networks:
+  marketplace_network:
+    driver: bridge
