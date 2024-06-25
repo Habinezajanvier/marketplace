@@ -21,8 +21,8 @@ import {
 } from '@nestjs/swagger';
 import { AssignCategoryDTO, ProductDTO } from '../dto/product.dto';
 import { ProductEntity } from '../entities/products.entity';
-import { AuthGuard } from 'src/users/authorisation/auth.guards';
-import { PaginationDTO, ParamsDTO } from 'src/common.dto';
+import { AuthGuard } from '../../users/authorisation/auth.guards';
+import { PaginationDTO, ParamsDTO } from '../../common.dto';
 import { NotFoundError } from 'rxjs';
 import { DeleteResult } from 'typeorm';
 
