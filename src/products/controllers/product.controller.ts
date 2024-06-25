@@ -15,8 +15,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
-  //   ApiBody,
-  //   ApiConsumes,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -36,38 +34,6 @@ export default class ProductController {
   @Post('/')
   @UseGuards(AuthGuard)
   @ApiBearerAuth()
-  //   @ApiConsumes('multipart/form-data')
-  //   @ApiBody({
-  //     schema: {
-  //       type: 'object',
-  //       properties: {
-  //         name: { type: 'string' },
-  //         quantity: { type: 'integer' },
-  //         avatars: {
-  //           type: 'array',
-  //           items: {
-  //             type: 'string',
-  //             format: 'binary',
-  //           },
-  //         },
-  //         picture: {
-  //           type: 'string',
-  //           format: 'binary',
-  //         },
-  //         categories: {
-  //           type: 'array',
-  //           items: {
-  //             type: 'object',
-  //             properties: {
-  //               id: {
-  //                 type: 'integer',
-  //               },
-  //             },
-  //           },
-  //         },
-  //       },
-  //     },
-  //   })
   @ApiOperation({ summary: 'Register new product' })
   @ApiResponse({ status: 201, description: 'Product registered successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -75,7 +41,6 @@ export default class ProductController {
     @Request() req,
     @Body() body: ProductDTO,
   ): Promise<ResponseData<ProductEntity>> {
-    console.log(JSON.stringify({ body: req.body }, null, 2));
     const { name, avatars, quantity, picture, price, categories } = body;
     const createdBy = req.user.id;
 

@@ -87,7 +87,6 @@ export default class ProductService {
       quantity: product.quantity - decrement,
     });
     const data = await this.productRepository.save(product);
-    console.log({ data });
 
     return data;
   };

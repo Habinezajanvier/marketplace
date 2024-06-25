@@ -33,7 +33,6 @@ export class MailerService implements MessageGateway {
       html: data.text,
       //   text: data.text,
     });
-    console.log({ emailResponse: response });
     return response;
   };
 }

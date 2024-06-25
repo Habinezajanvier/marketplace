@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { RabbitMQConnection } from '../../rabbit.connection';
 import { ProductDTO } from '../dto/product.dto';
 import ProductService from './product.service';
@@ -16,7 +16,6 @@ export class MqListerner {
     try {
       const parsedMessage: ProductDTO[] = JSON.parse(msg);
 
-      console.log(`Received Notification`, parsedMessage);
       Promise.all(
         parsedMessage.map((item) => {
           this.product.decrement(item.id, item.quantity);
@@ -25,8 +24,7 @@ export class MqListerner {
 
       // Implement your own notification flow
     } catch (error) {
-      console.log({ error });
-      console.error(`Error While Parsing the message`);
+      Logger.error(`Error While Parsing the message`);
     }
   };
 
