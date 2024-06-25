@@ -1,5 +1,5 @@
 import UserService from '../services/user.services';
-import { comparePassword, decode, encode, hashPassword } from '../helpers';
+import { JwtService, comparePassword, hashPassword } from '../helpers';
 import { LoginDTO, UserDTO, VerifyDTO } from '../dto/user.dto';
 // import { UserEntity } from '../user.entity';
 
@@ -35,6 +35,7 @@ export default class UserController {
   constructor(
     private readonly user: UserService,
     private message: MessageService,
+    private jwtService: JwtService,
   ) {
     this.message.registerChannel(
       MessageChannels.NODE_MAILER,
@@ -72,7 +73,7 @@ export default class UserController {
 
     const otp = digitid(5);
     const hashedOtp = await hashPassword(otp);
-    const otpToken = encode({ otp: hashedOtp }, 600);
+    const otpToken = this.jwtService.encode({ otp: hashedOtp }, 600);
 
     const emailTemplate = otpTemplate(otp, newUser.firstName);
 
@@ -123,7 +124,7 @@ export default class UserController {
         description: 'Authentication error',
       });
     }
-    const token = encode({ email, id: userExist.id });
+    const token = this.jwtService.encode({ email, id: userExist.id });
     return {
       error: false,
       message: 'User logged successfully',
@@ -148,7 +149,7 @@ export default class UserController {
       });
     }
 
-    const otpHash = decode(userExist.otp);
+    const otpHash = this.jwtService.decode(userExist.otp);
     if (!otpHash) {
       return new ForbiddenException('Failed to load your OTP', {
         cause: new Error(),
@@ -164,7 +165,7 @@ export default class UserController {
       });
     }
     await this.user.update(userExist.id, { verified: true } as UserDTO);
-    const token = encode({ email, id: userExist.id });
+    const token = this.jwtService.encode({ email, id: userExist.id });
 
     return {
       error: false,

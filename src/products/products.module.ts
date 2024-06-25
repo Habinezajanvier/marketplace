@@ -8,10 +8,17 @@ import { CategoryEntity } from './entities/category.entity';
 import CategoryController from './controllers/category.controller';
 import { RabbitMQConnection } from 'src/rabbit.connection';
 import { MqListerner } from './services/mqListerner.service';
+import { JwtService } from 'src/users/helpers';
 
 @Module({
   imports: [TypeOrmModule.forFeature([ProductEntity, CategoryEntity])],
-  providers: [ProductService, CategoryService, RabbitMQConnection, MqListerner],
+  providers: [
+    ProductService,
+    CategoryService,
+    RabbitMQConnection,
+    MqListerner,
+    JwtService,
+  ],
   controllers: [ProductController, CategoryController],
 })
 export class ProductsModule {}
