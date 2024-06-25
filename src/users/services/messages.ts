@@ -10,12 +10,12 @@ export enum MessageChannels {
 export default class MessageService {
   private messageChannels: Record<string, MessageGateway> = {};
 
-  public registerChannel(
+  public registerChannel = (
     messageChannel: MessageChannels,
     channel: MessageGateway,
-  ) {
+  ) => {
     this.messageChannels[messageChannel] = channel;
-  }
+  };
 
   public sendMessage = async (
     data: EmailDTO,

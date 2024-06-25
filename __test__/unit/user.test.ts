@@ -3,7 +3,8 @@ import { LoginDTO, UserDTO } from '../../src/users/dto/user.dto';
 import UsersController from '../../src/users/controllers/user.controller';
 import UsersService from '../../src/users/services/user.services';
 import MessageService from '../../src/users/services/messages';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtService } from '../../src/users/helpers';
 
 const createUserDto: UserDTO = {
   firstName: 'firstName #1',
@@ -26,9 +27,15 @@ describe('UsersController', () => {
   beforeEach(async () => {
     const app: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
+      imports: [
+        ConfigModule.forFeature(async () => ({
+          JWT_SECRET: 'test-secret',
+        })),
+      ],
       providers: [
         ConfigService,
         UsersService,
+        JwtService,
         MessageService,
         {
           provide: UsersService,
@@ -51,6 +58,13 @@ describe('UsersController', () => {
               },
             ]),
             findOne: jest.fn().mockImplementation((id: string) =>
+              Promise.resolve({
+                firstName: 'firstName #1',
+                lastName: 'lastName #1',
+                id,
+              }),
+            ),
+            update: jest.fn().mockImplementation((id: string) =>
               Promise.resolve({
                 firstName: 'firstName #1',
                 lastName: 'lastName #1',
@@ -83,7 +97,6 @@ describe('UsersController', () => {
         error: false,
         message: 'Account created successfuly',
       });
-      //   expect(usersService.create).toHaveBeenCalledWith(createUserDto);
     });
   });
 
