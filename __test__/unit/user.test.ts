@@ -60,8 +60,8 @@ describe('UsersController', () => {
 
   describe('register()', () => {
     it('should create a user', () => {
-      usersController.register(createUserDto);
-      expect(usersController.register(createUserDto)).resolves.toEqual({
+      const userReg = usersController.register(createUserDto);
+      expect(userReg).resolves.toEqual({
         error: false,
         message: 'Account created successfuly',
       });
