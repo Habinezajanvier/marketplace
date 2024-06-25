@@ -71,6 +71,11 @@
       "json-summary",
       "text",
       "lcov"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules",
+      "/__test__",
+      "/dist"
     ]
   }
 }
