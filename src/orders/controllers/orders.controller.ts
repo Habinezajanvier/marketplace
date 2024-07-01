@@ -18,12 +18,15 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { OrderDTO, OrderStatus } from '../dto/orders.dto';
-import { AuthGuard } from 'src/users/authorisation/auth.guards';
+import { AuthGuard } from 'src/guards/auth.guards';
 import OrderService from '../services/order.service';
 import { PaginationDTO, ParamsDTO } from 'src/common.dto';
 import { OrderEntity } from '../entities/orders.entitiy';
 import { NotFoundError } from 'rxjs';
 import { DeleteResult } from 'typeorm';
+import { Roles } from 'src/decorators/role.decorators';
+import { Role } from 'src/users/constant';
+import { RolesGuard } from 'src/guards/role.guards';
 
 @Controller('orders')
 @ApiTags('Orders')
@@ -63,6 +66,8 @@ export class OrdersController {
   }
 
   @Get('/')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all orders' })
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -85,7 +90,36 @@ export class OrdersController {
     };
   }
 
+  @Get('/my_orders')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get user's order" })
+  @ApiResponse({ status: 200, description: 'Success' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async getOwnerOrder(
+    @Request() req,
+  ): Promise<NotFoundError | ResponseData<OrderEntity[]>> {
+    const { id } = req.user;
+    const data = await this.order.getOwner(id);
+    return data.length
+      ? {
+          error: false,
+          message: 'Success',
+          data,
+        }
+      : new HttpException(
+          {
+            error: true,
+            message: 'No product found',
+          },
+          HttpStatus.NOT_FOUND,
+        );
+  }
+
   @Get(':id')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get one order by Id' })
   @ApiResponse({ status: 200, description: 'Success' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
@@ -111,7 +145,8 @@ export class OrdersController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete one products by Id' })
   @ApiResponse({ status: 200, description: 'Success' })

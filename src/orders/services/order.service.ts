@@ -125,6 +125,35 @@ export default class OrderService {
   };
 
   /**
+   *Get owners orders
+   * @param id
+   * @returns
+   */
+  getOwner = async (userId: number): Promise<OrderEntity[]> => {
+    return await this.orderRepository.find({
+      where: { createdBy: userId },
+      relations: {
+        orderItems: true,
+      },
+      select: {
+        id: true,
+        location: {
+          district: true,
+          sector: true,
+          village: true,
+        },
+        createdBy: true,
+        orderItems: {
+          id: true,
+          amount: true,
+          quantity: true,
+          createdAt: true,
+        },
+      },
+    });
+  };
+
+  /**
    * Update user
    * @param id
    * @param data

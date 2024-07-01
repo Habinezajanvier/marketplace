@@ -1,6 +1,6 @@
 import { Column, Entity } from 'typeorm';
 import { BaseColumnSchema } from '../baseEntinty';
-import { UserStatus } from './constant';
+import { Role, UserStatus } from './constant';
 
 @Entity({ name: 'users' })
 export class UserEntity extends BaseColumnSchema {
@@ -31,4 +31,11 @@ export class UserEntity extends BaseColumnSchema {
 
   @Column()
   password: string;
+
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.Buyer,
+  })
+  role: Role;
 }

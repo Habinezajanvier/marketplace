@@ -20,7 +20,7 @@ import {
 } from '@nestjs/swagger';
 import { CategoryDTO } from '../dto/category.dto';
 import { CategoryEntity } from '../entities/category.entity';
-import { AuthGuard } from 'src/users/authorisation/auth.guards';
+import { AuthGuard } from 'src/guards/auth.guards';
 import { ParamsDTO } from 'src/common.dto';
 import { NotFoundError } from 'rxjs';
 import { DeleteResult } from 'typeorm';
