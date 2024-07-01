@@ -24,8 +24,32 @@ export default class UserService {
    * Get all
    * @returns
    */
-  getAll = async (): Promise<UserEntity[]> => {
-    return await this.userRepository.find();
+  getAll = async (pagination: Paginations): Promise<ReturnData<UserEntity>> => {
+    const { page, pageSize } = pagination;
+    const skip = (page - 1) * pageSize;
+    const [content, count] = await Promise.all([
+      this.userRepository.find({
+        order: {
+          updatedAt: 'ASC',
+        },
+        take: pageSize,
+        skip,
+        select: [
+          'id',
+          'firstName',
+          'lastName',
+          'email',
+          'phoneNumber',
+          'status',
+          'createdAt',
+          'updatedAt',
+          'role',
+        ],
+      }),
+      this.userRepository.count(),
+    ]);
+    const pages = page ? Math.ceil(count / pageSize) : undefined;
+    return { content, count, pages };
   };
 
   /**
@@ -45,6 +69,7 @@ export default class UserService {
         'status',
         'createdAt',
         'updatedAt',
+        'role',
       ],
     });
   };

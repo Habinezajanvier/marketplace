@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from '../constant';
 
 export class UserDTO {
   @ApiProperty()
@@ -15,6 +16,9 @@ export class UserDTO {
   otp?: string;
 
   verified?: boolean;
+
+  @ApiProperty()
+  role: Role;
 }
 
 export class LoginDTO {

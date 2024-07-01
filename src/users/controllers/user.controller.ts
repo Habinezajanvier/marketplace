@@ -11,6 +11,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Query,
   Request,
   UseGuards,
 } from '@nestjs/common';
@@ -20,11 +21,16 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '../authorisation/auth.guards';
+import { AuthGuard } from '../../guards/auth.guards';
 import MessageService, { MessageChannels } from '../services/messages';
 import { MailerService } from '../services/message.gateway';
 import { otpTemplate } from '../../template/otpTemplate';
 import digitid from '../helpers/digitid';
+import { RolesGuard } from 'src/guards/role.guards';
+import { Roles } from 'src/decorators/role.decorators';
+import { Role } from '../constant';
+import { UserEntity } from '../user.entity';
+import { PaginationDTO } from 'src/common.dto';
 
 /**
  * User controller
@@ -49,8 +55,8 @@ export default class UserController {
   @HttpCode(201)
   async register(
     @Body() body: UserDTO,
-  ): Promise<ConflictException | ResponseData<Record<'access_token', string>>> {
-    const { firstName, lastName, email, password, phoneNumber } = body;
+  ): Promise<ConflictException | ResponseData<null>> {
+    const { firstName, lastName, email, password, phoneNumber, role } = body;
 
     const userExist = await this.user.checkUser(email);
     if (userExist) {
@@ -67,6 +73,7 @@ export default class UserController {
       email,
       phoneNumber,
       password: hashedPassword,
+      role,
     };
 
     const newUser = await this.user.create(data);
@@ -103,14 +110,14 @@ export default class UserController {
     const userExist = await this.user.checkUser(email);
 
     if (!userExist) {
-      return new ForbiddenException("Email or password doesn't exist", {
+      throw new ForbiddenException("Email or password doesn't exist", {
         cause: new Error(),
         description: 'Authentication error',
       });
     }
 
     if (!userExist.verified) {
-      return new ForbiddenException('Account is not verified', {
+      throw new ForbiddenException('Account is not verified', {
         cause: new Error(),
         description: 'Verification error',
       });
@@ -124,7 +131,11 @@ export default class UserController {
         description: 'Authentication error',
       });
     }
-    const token = this.jwtService.encode({ email, id: userExist.id });
+    const token = this.jwtService.encode({
+      email,
+      id: userExist.id,
+      role: userExist.role,
+    });
     return {
       error: false,
       message: 'User logged successfully',
@@ -165,7 +176,11 @@ export default class UserController {
       });
     }
     await this.user.update(userExist.id, { verified: true } as UserDTO);
-    const token = this.jwtService.encode({ email, id: userExist.id });
+    const token = this.jwtService.encode({
+      email,
+      id: userExist.id,
+      role: userExist.role,
+    });
 
     return {
       error: false,
@@ -187,6 +202,31 @@ export default class UserController {
       error: false,
       message: 'Success',
       data,
+    };
+  }
+
+  @Get('/')
+  @Roles(Role.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200, description: 'Success' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async getAll(
+    @Query() query: PaginationDTO,
+  ): Promise<ResponseData<ReturnData<UserEntity>>> {
+    const page = query.page!;
+    const pageSize = query.pageSize!;
+
+    const { content, pages, count } = await this.user.getAll({
+      page: page ? +page : 1,
+      pageSize: pageSize ? +pageSize : 12,
+    });
+
+    return {
+      error: false,
+      message: 'Success',
+      data: { content, pages, count },
     };
   }
 }

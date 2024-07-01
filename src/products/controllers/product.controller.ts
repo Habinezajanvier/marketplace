@@ -21,10 +21,13 @@ import {
 } from '@nestjs/swagger';
 import { AssignCategoryDTO, ProductDTO } from '../dto/product.dto';
 import { ProductEntity } from '../entities/products.entity';
-import { AuthGuard } from '../../users/authorisation/auth.guards';
+import { AuthGuard } from '../../guards/auth.guards';
 import { PaginationDTO, ParamsDTO } from '../../common.dto';
 import { NotFoundError } from 'rxjs';
 import { DeleteResult } from 'typeorm';
+import { Roles } from 'src/decorators/role.decorators';
+import { Role } from 'src/users/constant';
+import { RolesGuard } from 'src/guards/role.guards';
 
 @Controller('products')
 @ApiTags('Products')
@@ -32,7 +35,8 @@ export default class ProductController {
   constructor(private readonly product: ProductService) {}
 
   @Post('/')
-  @UseGuards(AuthGuard)
+  @Roles(Role.Seller)
+  @UseGuards(AuthGuard, RolesGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Register new product' })
   @ApiResponse({ status: 201, description: 'Product registered successfully' })
